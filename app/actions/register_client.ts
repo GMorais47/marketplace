@@ -1,7 +1,7 @@
 "use server"
 
 import { z } from "zod"
-import { Step01Schema, Step02Schema } from "../schemas/register_client.schema"
+import { Step01Schema, Step02Schema, Step03Schema } from "../schemas/register_client.schema"
 
 export type CustumerRegistrationStep01Error = {
     email?: string[]
@@ -60,6 +60,48 @@ export async function custumerRegisterStep02(prev: FormState<CustumerRegistratio
     }
 
     const { name, document, dateOfBirth, phone } = validatedFields.data
+
+    try {
+        return { success: true }
+    } catch (err) {
+        console.error(err)
+        return { success: false, message: "Erro Interno do Servidor" }
+    }
+}
+
+export type CustumerRegistrationStep03Error = {
+    zipcode?: string[],
+    publicPlace?: string[],
+    number?: string[],
+    neighborhood?: string[],
+    complement?: string[],
+    city?: string[],
+    state?: string[],
+}
+
+export async function custumerRegisterStep03(prev: FormState<CustumerRegistrationStep03Error>, formData: FormData): Promise<FormState<CustumerRegistrationStep03Error>> {
+
+    const validatedFields = Step03Schema.safeParse(
+        Object.fromEntries(formData.entries())
+    )
+
+    if (!validatedFields.success) {
+        const { properties } = z.treeifyError(validatedFields.error)
+        return {
+            success: false,
+            errors: {
+                zipcode: properties?.zipcode?.errors,
+                publicPlace: properties?.publicPlace?.errors,
+                number: properties?.number?.errors,
+                neighborhood: properties?.neighborhood?.errors,
+                complement: properties?.complement?.errors,
+                city: properties?.city?.errors,
+                state: properties?.state?.errors,
+            }
+        }
+    }
+
+    const { zipcode, publicPlace, number, neighborhood, complement, city, state } = validatedFields.data
 
     try {
         return { success: true }

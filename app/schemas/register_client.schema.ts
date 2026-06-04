@@ -1,3 +1,4 @@
+import { EXPORT_DETAIL } from "next/dist/shared/lib/constants"
 import { z } from "zod"
 
 export const Step01Schema = z.object({
@@ -9,4 +10,14 @@ export const Step02Schema = z.object({
     document: z.string("O CPF é de preenchimento obrigatório"),
     dateOfBirth: z.string("A data de nascimento deve ser uma data válida").optional(),
     phone: z.string("O telefone é de preenchimento obrigatório")
+})
+
+export const Step03Schema = z.object({
+    zipcode: z.string(),
+    publicPlace: z.string(),
+    number: z.string(),
+    neighborhood: z.string(),
+    complement: z.string().optional(),
+    city: z.string(),
+    state: z.string(),
 })

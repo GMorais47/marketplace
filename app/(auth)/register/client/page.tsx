@@ -1,11 +1,13 @@
 "use client"
 
-import { custumerRegisterStep02, CustumerRegistrationStep01Error, CustumerRegistrationStep02Error, validateEmail } from "@/app/actions/register_client";
+import { custumerRegisterStep02, custumerRegisterStep03, CustumerRegistrationStep01Error, CustumerRegistrationStep02Error, CustumerRegistrationStep03Error, validateEmail } from "@/app/actions/register_client";
 import { Button } from "@/app/components/button";
 import { Input } from "@/app/components/input";
+import { Select } from "@/app/components/select";
 import { ECustomerRegistrationSteps, TCustomerRegister } from "@/app/interfaces/client";
+import { STATES } from "@/app/mocks/states";
 import Link from "next/link";
-import { Dispatch, SetStateAction, useActionState, useEffect, useRef, useState } from "react"
+import { ChangeEvent, ChangeEventHandler, Dispatch, SetStateAction, useActionState, useEffect, useRef, useState } from "react"
 import toast from "react-hot-toast";
 
 interface IProps {
@@ -104,25 +106,132 @@ function Step02({ setStep, setClient }: IProps) {
     )
 }
 
+const initialStateStep03: FormState<CustumerRegistrationStep03Error> = { success: false }
+
 function Step03({ setStep, setClient }: IProps) {
+    const [formState, formAction, isPending] = useActionState(custumerRegisterStep03, initialStateStep03)
+
+    const [loading, setLoading] = useState<boolean>(false)
+    const [zipcode, setZipcode] = useState<string>("")
+    const [publicPlace, setPublicPlace] = useState<string>("")
+    const [number, setNumber] = useState<string>("")
+    const [neighborhood, setNeighborhood] = useState<string>("")
+    const [complement, setComplement] = useState<string>("")
+    const [city, setCity] = useState<string>("")
+    const [state, setState] = useState<string>("")
+
+    const searchZipCode = async (value: string) => {
+        setLoading(true)
+        const response = await fetch(`https://viacep.com.br/ws/${value}/json/`)
+            .then(data => data.json())
+            .then(data => {
+                if (data["erro"]) throw new Error()
+                return {
+                    publicPlace: data["logradouro"] || "",
+                    complement: data["complemento"] || "",
+                    neighborhood: data["bairro"] || "",
+                    city: data["localidade"] || "",
+                    state: data["uf"] || ""
+                }
+            })
+            .catch(err => {
+                console.log(err)
+                toast.error("Não foi possível obter as informações do CEP");
+                return null
+            })
+            .finally(() => setLoading(false))
+
+        if (!response) return;
+
+        setPublicPlace(response.publicPlace)
+        setComplement(response.complement)
+        setNeighborhood(response.neighborhood)
+        setCity(response.city)
+        setState(response.state)
+    }
+
+    const handleZipCode = (e: ChangeEvent<HTMLInputElement, HTMLInputElement>) => {
+        const value = e.currentTarget.value;
+        setZipcode(value)
+
+        if (value.length === 8) searchZipCode(value)
+    }
+
+    useEffect(() => {
+        if (!formState.success && (
+            zipcode !== "" ||
+            publicPlace !== "" ||
+            number !== "" ||
+            neighborhood !== "" ||
+            city !== "" ||
+            state !== "" 
+        )) {
+            let message: string = "Ocorreu um erro desconhecido"
+
+            if (formState.errors && formState.errors) {
+                if (formState.errors.zipcode) message = formState.errors.zipcode[0]
+                if (formState.errors.publicPlace) message = formState.errors.publicPlace[0]
+                if (formState.errors.number) message = formState.errors.number[0]
+                if (formState.errors.neighborhood) message = formState.errors.neighborhood[0]
+                if (formState.errors.complement) message = formState.errors.complement[0]
+                if (formState.errors.city) message = formState.errors.city[0]
+                if (formState.errors.state) message = formState.errors.state[0]
+
+            } else if (formState.message) {
+                message = formState.message
+            }
+
+            toast.error(message)
+        } else if (formState.success) {
+            setClient(prev => ({
+                ...prev,
+                address: [{
+                    zipcode,
+                    publicPlace,
+                    number,
+                    neighborhood,
+                    complement,
+                    city,
+                    state
+                }]
+            }))
+            setStep(ECustomerRegistrationSteps.STEP04)
+        }
+    }, [formState])
+
     return (
-        <form className="flex flex-col gap-2 mt-2">
-            <div className="flex flex-row gap-2 items-center">
-                <Input label="Endereço" />
-                <Input label="Número" />
+        <form action={formAction} className="mt-2 grid grid-cols-4 gap-2 max-w-md">
+            <Input id="zipcode" name="zipcode" value={zipcode} onChange={handleZipCode} disabled={loading} required label="CEP" />
+            <div className="col-span-2">
+                <Input id="publicPlace" name="publicPlace" value={publicPlace} onChange={(e) => setPublicPlace(e.currentTarget.value)} disabled={loading} required label="Endereço" />
             </div>
-            <div className="flex flex-row gap-2 items-center">
-                <Input label="Complemento" />
-                <Input label="Bairro" />
+            <Input id="number" name="number" value={number} onChange={(e) => setNumber(e.currentTarget.value)} required label="Número" />
+
+            <div className="col-span-2">
+                <Input id="complement" name="complement" value={complement} onChange={(e) => setComplement(e.currentTarget.value)} disabled={loading} label="Complemento" />
             </div>
-            <div className="flex flex-row gap-2 items-center">
-                <Input label="Cidade" />
-                <select></select>
-                <Input label="CEP" />
+            <div className="col-span-2">
+                <Input id="neighborhood" name="neighborhood" value={neighborhood} onChange={(e) => setNeighborhood(e.currentTarget.value)} disabled={loading} required label="Bairro" />
             </div>
-            <div className="flex flex-row gap-2 items-center">
-                <Button type="button" onClick={() => setStep(ECustomerRegistrationSteps.STEP02)}>Voltar</Button>
-                <Button type="submit">Avançar</Button>
+
+            <div className="col-span-3">
+                <Input id="city" name="city" value={city} onChange={(e) => setCity(e.currentTarget.value)} disabled={loading} required label="Cidade" />
+            </div>
+            <Select id="state" name="state" value={state} onChange={e => setState(e.currentTarget.value)} disabled={loading} required label="Estado">
+                {
+                    STATES
+                        .sort((a, b) => a.acronym.localeCompare(b.acronym))
+                        .map(stt => (
+                            <option key={`stt-${stt.acronym}`} value={stt.acronym}>{stt.acronym}</option>
+                        ))
+                }
+            </Select>
+
+            <div className="col-span-4 flex flex-row items-center gap-2">
+                <Button disabled={loading} type="button" onClick={() => setStep(ECustomerRegistrationSteps.STEP02)}>Voltar</Button>
+                <Button disabled={loading || isPending} type="submit">
+                    {isPending ? "Carregando" : "Avançar"}
+                </Button>
             </div>
         </form>
     )
