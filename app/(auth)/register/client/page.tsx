@@ -1,12 +1,14 @@
 "use client"
 
-import { custumerRegisterStep02, custumerRegisterStep03, custumerRegisterStep04, CustumerRegistrationStep01Error, CustumerRegistrationStep02Error, CustumerRegistrationStep03Error, CustumerRegistrationStep04Error, validateEmail } from "@/app/actions/register_client";
+import { custumerRegister, custumerRegisterStep02, custumerRegisterStep03, custumerRegisterStep04, CustumerRegistrationStep01Error, CustumerRegistrationStep02Error, CustumerRegistrationStep03Error, CustumerRegistrationStep04Error, validateEmail } from "@/app/actions/register_client";
 import { Button } from "@/app/components/button";
 import { Input } from "@/app/components/input";
 import { Select } from "@/app/components/select";
 import { ECustomerRegistrationSteps, TCustomerRegister } from "@/app/interfaces/client";
 import { STATES } from "@/app/mocks/states";
+import { error } from "console";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, Dispatch, SetStateAction, useActionState, useEffect, useState } from "react"
 import toast from "react-hot-toast";
 
@@ -281,56 +283,73 @@ function Step04({ setStep, setClient, client }: IProps) {
 }
 
 function Overview({ setStep, client }: Omit<IProps, "setClient">) {
+    const router = useRouter()
+    const [state, formAction, isPending] = useActionState(custumerRegister, { success: false })
     const address = client.address ? client.address[0] : undefined
+
+    useEffect(() => {
+        if (!state.success && state.errors) {
+            const errors = Object.values(state.errors)
+            const message = errors.flat()
+            toast.error(message.length > 0 ? message[0] : state.message || "Ocorreu um erro desconhecido")
+        } else if (state.success) {
+            toast.success(state.message || "Cadastro realizado com sucesso!")
+            setTimeout(() => router.push("/login"), 2000)
+        }
+    }, [state])
+
     return (
-        <div className="grid grid-cols-4 gap-2 mt-2">
+        <form action={formAction} className="grid grid-cols-4 gap-2 mt-2">
             <div className="col-span-4">
-                <Input label="Nome Completo" value={client.name} disabled onChange={() => { }} />
+                <Input id="name" name="name" label="Nome Completo" value={client.name} readOnly onChange={() => { }} />
             </div>
             <div className="col-span-2">
-                <Input label="E-mail" value={client.email} disabled onChange={() => { }} />
+                <Input id="email" name="email" label="E-mail" value={client.email} readOnly onChange={() => { }} />
             </div>
             <div className="col-span-2">
-                <Input label="CPF" value={client.document} disabled onChange={() => { }} />
+                <Input id="document" name="document" label="CPF" value={client.document} readOnly onChange={() => { }} />
             </div>
             <div className="col-span-2">
-                <Input label="Data de Nascimento" type="date" value={client.dateOfBirth?.toDateString()} disabled onChange={() => { }} />
+                <Input id="dateOfBirth" name="dateOfBirth" label="Data de Nascimento" type="date" value={client.dateOfBirth?.toDateString()} readOnly onChange={() => { }} />
             </div>
             <div className="col-span-2">
-                <Input label="Telefone" value={client.phone} disabled onChange={() => { }} />
+                <Input id="phone" name="phone" label="Telefone" value={client.phone} readOnly onChange={() => { }} />
             </div>
-            <Input label="CEP" value={address?.zipcode} disabled onChange={() => { }} />
+            <Input id="zipcode" name="zipcode" label="CEP" value={address?.zipcode} readOnly onChange={() => { }} />
             <div className="col-span-2">
-                <Input label="Endereço" value={address?.publicPlace} disabled onChange={() => { }} />
+                <Input id="publicPlace" name="publicPlace" label="Endereço" value={address?.publicPlace} readOnly onChange={() => { }} />
             </div>
-            <Input label="Número" value={address?.number} disabled onChange={() => { }} />
+            <Input id="number" name="number" label="Número" value={address?.number} readOnly onChange={() => { }} />
             <div className="col-span-2">
-                <Input label="Complemento" value={address?.complement} disabled onChange={() => { }} />
+                <Input id="complement" name="complement" label="Complemento" value={address?.complement} readOnly onChange={() => { }} />
             </div>
             <div className="col-span-2">
-                <Input label="Bairro" value={address?.neighborhood} disabled onChange={() => { }} />
+                <Input id="neighborhood" name="neighborhood" label="Bairro" value={address?.neighborhood} readOnly onChange={() => { }} />
             </div>
             <div className="col-span-3">
-                <Input label="Cidade" value={address?.city} disabled onChange={() => { }} />
+                <Input id="city" name="city" label="Cidade" value={address?.city} readOnly onChange={() => { }} />
             </div>
-            <Input label="UF" value={address?.state} disabled onChange={() => { }} />
+            <Input id="state" name="state" label="UF" value={address?.state} readOnly onChange={() => { }} />
             <div className="col-span-4">
-                <Input
+                <Input id="password" name="password"
+                    type="password"
                     label="Senha"
-                    value={
-                        Array.from({ length: client.password?.length || 8 })
-                            .map(() => "•")
-                            .join("")
-                    }
-                    disabled
+                    value={client.password}
+                    readOnly
+                    onChange={() => { }}
+                />
+                <Input id="confPassword" name="confPassword"
+                    type="hidden"
+                    value={client.password}
+                    readOnly
                     onChange={() => { }}
                 />
             </div>
             <div className="col-span-4 flex flex-row gap-2 items-center">
-                <Button onClick={() => setStep(ECustomerRegistrationSteps.STEP04)}>Voltar</Button>
-                <Button>Cadastrar</Button>
+                <Button type="button" onClick={() => setStep(ECustomerRegistrationSteps.STEP04)}>Voltar</Button>
+                <Button type="submit">Cadastrar</Button>
             </div>
-        </div>
+        </form>
     )
 }
 
