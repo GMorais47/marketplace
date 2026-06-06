@@ -21,3 +21,8 @@ export const Step03Schema = z.object({
     city: z.string(),
     state: z.string(),
 })
+
+export const Step04Schema = z.object({
+    password: z.string(),
+    confPassword: z.string()
+})

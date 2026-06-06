@@ -1,7 +1,7 @@
 "use server"
 
 import { z } from "zod"
-import { Step01Schema, Step02Schema, Step03Schema } from "../schemas/register_client.schema"
+import { Step01Schema, Step02Schema, Step03Schema, Step04Schema } from "../schemas/register_client.schema"
 
 export type CustumerRegistrationStep01Error = {
     email?: string[]
@@ -102,6 +102,45 @@ export async function custumerRegisterStep03(prev: FormState<CustumerRegistratio
     }
 
     const { zipcode, publicPlace, number, neighborhood, complement, city, state } = validatedFields.data
+
+    try {
+        return { success: true }
+    } catch (err) {
+        console.error(err)
+        return { success: false, message: "Erro Interno do Servidor" }
+    }
+}
+
+export type CustumerRegistrationStep04Error = {
+    password?: string[],
+    confPassword?: string[]
+}
+
+export async function custumerRegisterStep04(prev: FormState<CustumerRegistrationStep04Error>, formData: FormData): Promise<FormState<CustumerRegistrationStep04Error>> {
+
+    const validatedFields = Step04Schema.safeParse(
+        Object.fromEntries(formData.entries())
+    )
+
+    if (!validatedFields.success) {
+        const { properties } = z.treeifyError(validatedFields.error)
+        return {
+            success: false,
+            errors: {
+                password: properties?.password?.errors,
+                confPassword: properties?.confPassword?.errors
+            }
+        }
+    }
+
+    const { password, confPassword } = validatedFields.data
+
+    if(password !== confPassword){
+        return {
+            success: false,
+            message: "As senhas não são iguais"
+        }
+    }
 
     try {
         return { success: true }
