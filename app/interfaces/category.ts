@@ -1,5 +1,6 @@
 interface ICategory {
     readonly id: number,
     name: string,
-    path: string
+    path: string,
+    highlights: boolean
 }
