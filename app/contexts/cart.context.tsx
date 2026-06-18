@@ -12,26 +12,7 @@ const CartContext = createContext<ICartContext>(null!);
 
 export function CartProvider({ children }: Readonly<{ children: ReactNode }>) {
     const [cart, setCart] = useState<ICart>({
-        products: [
-            {
-                id: 0,
-                name: "Produto",
-                categoryID: 1,
-                description: "Descrição",
-                sellerID: 1,
-                amount: 10,
-                price: 2.25,
-            },
-            {
-                id: 1,
-                name: "Produto 2",
-                categoryID: 1,
-                description: "Descrição 2",
-                sellerID: 1,
-                amount: 20,
-                price: 456.34,
-            }
-        ], total: 0
+        products: [], total: 0
     })
 
     const add = (product: IProductCart) => {

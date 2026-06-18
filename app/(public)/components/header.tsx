@@ -18,7 +18,7 @@ function HeaderButton({ children, onClick, notification }: {
     return (
         <Button onClick={onClick} className="relative h-6 w-6 hover:bg-[#03738C22] hover:text-[#00BC99] cursor-pointer rounded-md flex items-center justify-center">
             {
-                notification &&
+                notification !== undefined &&
                 notification > 0 &&
                 (
                     <div className="absolute h-3 w-3 flex items-center justify-center -top-px -right-px bg-[#00BC99] text-[6px] text-white rounded-full p-px">
@@ -115,7 +115,7 @@ function CartItem({ data, add, remove }: {
 
 export function Header() {
     const [show, setShow] = useState<boolean>(false);
-    const [showCart, setShowCart] = useState<boolean>(true);
+    const [showCart, setShowCart] = useState<boolean>(false);
     const { cart, add, remove } = useCart();
 
     return (
@@ -208,7 +208,7 @@ export function Header() {
             </section>
 
             {/* CARRINHO */}
-            <section className={`absolute inset-y-0 right-0 bg-white shadow-lg rounded-tr-md rounded-br-md transition-all duration-700 ease-in-out ${showCart ? "w-50" : "w-0"}`}>
+            <section className={`z-40 absolute inset-y-0 right-0 bg-white shadow-lg rounded-tr-md rounded-br-md transition-all duration-700 ease-in-out ${showCart ? "w-50" : "w-0 overflow-hidden"}`}>
                 <div className="relative h-full">
                     {showCart && (<button onClick={() => setShowCart(false)} className="absolute -left-3 top-2 bg-[#00BC99] flex items-center justify-center text-white h-6 w-6 rounded-md cursor-pointer hover:text-[#012E40] shadow-lg">
                         <IoClose />
