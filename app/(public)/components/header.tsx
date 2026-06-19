@@ -16,7 +16,7 @@ function HeaderButton({ children, onClick, notification }: {
     notification?: number
 }) {
     return (
-        <Button onClick={onClick} className="relative h-6 w-6 hover:bg-[#03738C22] hover:text-[#00BC99] cursor-pointer rounded-md flex items-center justify-center">
+        <button onClick={onClick} className="relative h-6 w-6 bg-transparent hover:bg-[#03738C22] hover:text-[#00BC99] cursor-pointer rounded-md flex items-center justify-center">
             {
                 notification !== undefined &&
                 notification > 0 &&
@@ -27,7 +27,7 @@ function HeaderButton({ children, onClick, notification }: {
                 )
             }
             {children}
-        </Button>
+        </button>
     )
 }
 
@@ -163,7 +163,7 @@ export function Header() {
             </header>
 
             {/* MENU LATERAL */}
-            <section className={`absolute h-svh bg-white shadow-lg rounded-tr-md rounded-br-md transition-all duration-700 ease-in-out ${show ? "w-50" : "w-0"}`}>
+            <section className={`z-40 absolute h-svh bg-white shadow-lg rounded-tr-md rounded-br-md transition-all duration-700 ease-in-out ${show ? "w-50" : "w-0"}`}>
                 <div className="relative h-full">
                     {show && (<button onClick={() => setShow(false)} className="absolute -right-3 top-2 bg-[#00BC99] flex items-center justify-center text-white h-6 w-6 rounded-md cursor-pointer hover:text-[#012E40] shadow-lg">
                         <IoClose />

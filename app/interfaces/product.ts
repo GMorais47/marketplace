@@ -5,5 +5,6 @@ interface IProduct {
     description: string,
     photo?: string,
     price: number,
-    readonly sellerID: number
+    readonly sellerID: number,
+    rating: number
 }
