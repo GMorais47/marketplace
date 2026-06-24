@@ -4,7 +4,6 @@ import { Button } from "@/app/components/button";
 import { Card } from "@/app/components/card";
 import { CATEGORIES } from "@/app/mocks/categories";
 import { PRODUCTS } from "@/app/mocks/products";
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -14,6 +13,7 @@ import { QuantitySelector } from "../../components/quantity-selector";
 import { useState } from "react";
 import { useCart } from "@/app/contexts/cart.context";
 import { IoArrowRedoSharp } from "react-icons/io5";
+import { Image } from "@/app/components/image";
 
 export default function Page() {
   const { id } = useParams<{ id: string }>()
@@ -45,16 +45,13 @@ export default function Page() {
       <div className="flex flex-row flex-wrap gap-2">
         {/* INFO GERAL */}
         <Card className="flex-3 flex flex-row gap-2 flex-wrap">
-          {/* IMAGEM */}
-          <div className="overflow-hidden h-100 w-100 rounded-lg relative flex items-center justify-center text-slate-200">
-            {
-              product.photo ? <Image
-                alt={product.name}
-                src={product.photo}
-                fill
-              /> : <MdHideImage size={160} />
-            }
-          </div>
+          <Image
+            alt={product.name}
+            src={product.photo}
+            height={400}
+            width={400}
+            size={160}
+          />
           {/* INFOS */}
           <div className="flex-1">
             <Link href={category?.path || "#"} className="text-slate-400 text-[10px]">{category?.name || "Não identificado"}</Link>
@@ -87,16 +84,14 @@ export default function Page() {
             <Button onClick={handleAdd} className="flex-1 flex flex-row items-center justify-center gap-2"><FaCartPlus /> Adicionar</Button>
           </Card>
           {/* VENDEDOR */}
-          <Card className="flex flex-row gap-2 items-center">
-            <div className="relative text-slate-200 h-10 w-10 rounded-md overflow-hidden p-2">
-              {
-                product.photo ? <Image
-                  alt={product.name}
-                  src={product.photo}
-                  fill
-                /> : <MdHideImage size={30} />
-              }
-            </div>
+          <Card title="Vendedor" className="flex flex-row gap-2 items-center">
+            <Image
+              alt={product.name}
+              src={product.photo}
+              height={40}
+              width={40}
+              size={30}
+            />
             <div className="h-full flex-1 flex flex-row items-center gap-2">
               <div className="h-full flex-1 p-2">
                 <div className="font-bold text-md">Nome do Vendedor</div>
@@ -112,7 +107,7 @@ export default function Page() {
             </div>
           </Card>
           {/* MAIS PRODUTOS DO VENDEDOR */}
-          <Card>
+          <Card title="Mais produtos do Vendedor">
             <ul>
               {
                 PRODUCTS
@@ -120,18 +115,16 @@ export default function Page() {
                   .slice(0, 3)
                   .map(prd => (
                     <li key={`seller-product-${prd.id}`} >
-                      <Link 
-                      href={`${CATEGORIES.find(cat => cat.id === prd.categoryID)?.path}/${prd.id}`} 
-                      className="flex flex-row items-center gap-2">
-                        <div className="relative text-slate-200 h-10 w-10 rounded-md overflow-hidden p-2">
-                          {
-                            prd.photo ? <Image
-                              alt={prd.name}
-                              src={prd.photo}
-                              fill
-                            /> : <MdHideImage size={30} />
-                          }
-                        </div>
+                      <Link
+                        href={`${CATEGORIES.find(cat => cat.id === prd.categoryID)?.path}/${prd.id}`}
+                        className="flex flex-row items-center gap-2">
+                        <Image
+                          alt={prd.name}
+                          src={prd.photo}
+                          height={40}
+                          width={40}
+                          size={30}
+                        />
                         <div className="h-full flex-1 p-2">
                           <div className="font-bold text-xs">{prd.name}</div>
                           <div className="text-[10px]">

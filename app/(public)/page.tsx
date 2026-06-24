@@ -4,11 +4,10 @@ import { FaCartPlus } from "react-icons/fa";
 import { Card } from "../components/card";
 import { CATEGORIES } from "../mocks/categories";
 import { PRODUCTS } from "../mocks/products";
-import { MdHideImage } from "react-icons/md";
 import { useCart } from "../contexts/cart.context";
 import Link from "next/link";
-import Image from "next/image";
 import toast from "react-hot-toast";
+import { Image } from "../components/image";
 
 function Item({ data }: { data: IProduct }) {
   const { add } = useCart();
@@ -30,15 +29,13 @@ function Item({ data }: { data: IProduct }) {
   return (
     <Card>
       <Link href={href} className="group transition-all ease-in-out duration-300">
-        <div className="mb-2 relative text-slate-200 w-26 h-26 rounded-lg overflow-hidden flex items-center justify-center">
-          {
-            data.photo ? <Image
-              alt={data.name}
-              src={data.photo}
-              fill
-            /> : <MdHideImage size={60} />
-          }
-        </div>
+        <Image
+          alt={data.name}
+          src={data.photo}
+          height={104}
+          width={104}
+          size={60}
+        />
         <div>
           <div className="text-[12px] font-bold group-hover:text-[#03738C]">{data.name}</div>
           <div className="text-[10px] text-slate-400 group-hover:text-[#03738C]">
