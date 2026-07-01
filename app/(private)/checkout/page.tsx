@@ -9,11 +9,13 @@ import { FaCircleCheck } from "react-icons/fa6";
 import { IoCart } from "react-icons/io5";
 import { Cart } from "./(steps)/cart";
 import { Address } from "./(steps)/address";
+import { Payment } from "./(steps)/payament";
+import { Overview } from "./(steps)/overview";
 
 enum EStep {
   CART,
   ADDRESS,
-  PAYAMENT,
+  PAYMENT,
   OVERVIEW,
   STATUS
 }
@@ -27,7 +29,7 @@ interface IStep {
 const STEPS: Array<IStep> = [
   { icon: IoCart, label: "Carrinho", value: EStep.CART },
   { icon: FaMapMarkerAlt, label: "Endereço", value: EStep.ADDRESS },
-  { icon: FaCreditCard, label: "Pagamento", value: EStep.PAYAMENT },
+  { icon: FaCreditCard, label: "Pagamento", value: EStep.PAYMENT },
   { icon: FaEye, label: "Revisão", value: EStep.OVERVIEW },
   { icon: FaCircleCheck, label: "Concluir", value: EStep.STATUS }
 ]
@@ -53,7 +55,11 @@ export default function Page() {
       case EStep.CART:
         return <Cart onNext={() => setStep(EStep.ADDRESS)} />
       case EStep.ADDRESS:
-        return <Address onNext={() => setStep(EStep.PAYAMENT)} onPrevius={() => setStep(EStep.CART)} />
+        return <Address onNext={() => setStep(EStep.PAYMENT)} onPrevius={() => setStep(EStep.CART)} />
+      case EStep.PAYMENT:
+        return <Payment onNext={() => setStep(EStep.OVERVIEW)} onPrevius={() => setStep(EStep.ADDRESS)} />
+      case EStep.OVERVIEW:
+        return <Overview />
     }
   }
 
@@ -62,10 +68,10 @@ export default function Page() {
       <Card className="flex flex-row items-center gap-6 justify-center mb-2 flex-wrap">
         {
           STEPS.map((st, i) => (
-            <>
-              <Step key={`step-${i}`} data={st} step={step} setStep={setStep} />
+            <div key={`step-${i}`} className="flex items-center justify-center gap-6">
+              <Step data={st} step={step} setStep={setStep} />
               {i < (STEPS.length - 1) && <div className="w-4 h-1 bg-gray-300" />}
-            </>
+            </div>
           ))
         }
       </Card>

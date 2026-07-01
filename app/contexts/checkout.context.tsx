@@ -7,7 +7,20 @@ interface IContext {
     cart: ICart,
     address: IAddress | null,
     setAddress: Dispatch<SetStateAction<IAddress | null>>
-    payament: any
+    payment: {
+        cardNumber: string
+        setCardNumber: Dispatch<SetStateAction<string>>
+        cardholder: string
+        setCardholder: Dispatch<SetStateAction<string>>
+        expirationDate: string
+        setExpirationDate: Dispatch<SetStateAction<string>>
+        cvv: string
+        setCvv: Dispatch<SetStateAction<string>>
+        document: string
+        setDocument: Dispatch<SetStateAction<string>>
+        installment: number,
+        setInstallment: Dispatch<SetStateAction<number>>
+    }
 }
 
 const Context = createContext<IContext>(null!);
@@ -19,8 +32,24 @@ interface IProps {
 export function CheckoutProvider({ children }: IProps) {
     const { cart } = useCart()
     const [address, setAddress] = useState<IAddress | null>(null)
+    const [cardNumber, setCardNumber] = useState<string>("")
+    const [cardholder, setCardholder] = useState<string>("")
+    const [expirationDate, setExpirationDate] = useState<string>("")
+    const [cvv, setCvv] = useState<string>("")
+    const [document, setDocument] = useState<string>("")
+    const [installment, setInstallment] = useState<number>(1);
+    
     return (
-        <Context.Provider value={{ cart, address, setAddress, payament: null }}>
+        <Context.Provider value={{
+            cart, address, setAddress, payment: {
+                cardNumber, setCardNumber,
+                cardholder, setCardholder,
+                expirationDate, setExpirationDate,
+                cvv, setCvv,
+                document, setDocument,
+                installment, setInstallment
+            }
+        }}>
             {children}
         </Context.Provider>
     )
