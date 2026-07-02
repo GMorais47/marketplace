@@ -1,5 +1,6 @@
-type FormState<T> = {
+type FormState<T, D = undefined> = {
     success: boolean;
     errors?: T,
-    message?: string
+    message?: string,
+    data?: D
 }

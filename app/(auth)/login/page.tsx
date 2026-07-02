@@ -4,18 +4,23 @@ import { login, LoginError } from "@/app/actions/login";
 import { Button } from "@/app/components/button";
 import { Input } from "@/app/components/input";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react"
 import toast from "react-hot-toast";
 
-const initialState: FormState<LoginError> = { success: false }
+const initialState: FormState<LoginError, any> = { success: false }
 
 export default function Page() {
     const [state, formAction, isPending] = useActionState(login, initialState)
+    const router = useRouter()
 
     useEffect(() => {
 
         if (state.success) {
             toast.success(state.message || "Login realizado com sucesso!")
+            setTimeout(()=> {
+                router.push("/")
+            }, 2000)
         } else if (state.errors || state.message) {
             let message: string | undefined
 
@@ -29,7 +34,7 @@ export default function Page() {
                 }
             }
 
-            toast.error(message || "Ocorreu um erro desconhecido")
+            toast.error(message || state.message || "Ocorreu um erro desconhecido")
         }
 
     }, [state])

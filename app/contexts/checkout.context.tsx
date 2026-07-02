@@ -21,6 +21,7 @@ interface IContext {
         installment: number,
         setInstallment: Dispatch<SetStateAction<number>>
     }
+    onCheckout: () => Promise<void>
 }
 
 const Context = createContext<IContext>(null!);
@@ -38,7 +39,11 @@ export function CheckoutProvider({ children }: IProps) {
     const [cvv, setCvv] = useState<string>("")
     const [document, setDocument] = useState<string>("")
     const [installment, setInstallment] = useState<number>(1);
-    
+
+    const onCheckout = async () => { 
+
+    }
+
     return (
         <Context.Provider value={{
             cart, address, setAddress, payment: {
@@ -48,7 +53,7 @@ export function CheckoutProvider({ children }: IProps) {
                 cvv, setCvv,
                 document, setDocument,
                 installment, setInstallment
-            }
+            }, onCheckout
         }}>
             {children}
         </Context.Provider>

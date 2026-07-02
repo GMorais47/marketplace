@@ -11,13 +11,14 @@ import { Cart } from "./(steps)/cart";
 import { Address } from "./(steps)/address";
 import { Payment } from "./(steps)/payament";
 import { Overview } from "./(steps)/overview";
+import { useCheckout } from "@/app/contexts/checkout.context";
+import { useRouter } from "next/navigation";
 
 enum EStep {
   CART,
   ADDRESS,
   PAYMENT,
-  OVERVIEW,
-  STATUS
+  OVERVIEW
 }
 
 interface IStep {
@@ -31,7 +32,6 @@ const STEPS: Array<IStep> = [
   { icon: FaMapMarkerAlt, label: "Endereço", value: EStep.ADDRESS },
   { icon: FaCreditCard, label: "Pagamento", value: EStep.PAYMENT },
   { icon: FaEye, label: "Revisão", value: EStep.OVERVIEW },
-  { icon: FaCircleCheck, label: "Concluir", value: EStep.STATUS }
 ]
 
 function Step({ data, step, setStep }: { data: IStep, step: EStep, setStep: Dispatch<SetStateAction<EStep>> }) {
@@ -49,6 +49,18 @@ function Step({ data, step, setStep }: { data: IStep, step: EStep, setStep: Disp
 
 export default function Page() {
   const [step, setStep] = useState<EStep>(EStep.CART)
+  const { onCheckout } = useCheckout()
+  const router = useRouter();
+
+  const handleCheckout = async () => {
+    onCheckout()
+      .then(() => { 
+        router.push('/checkout/success')
+      })
+      .catch(() => { 
+        router.push('/checkout/error')
+      })
+  }
 
   const render = () => {
     switch (step) {
@@ -59,7 +71,7 @@ export default function Page() {
       case EStep.PAYMENT:
         return <Payment onNext={() => setStep(EStep.OVERVIEW)} onPrevius={() => setStep(EStep.ADDRESS)} />
       case EStep.OVERVIEW:
-        return <Overview />
+        return <Overview onNext={handleCheckout} onPrevius={() => setStep(EStep.PAYMENT)} />
     }
   }
 

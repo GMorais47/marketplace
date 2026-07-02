@@ -8,7 +8,7 @@ export type CustumerRegistrationStep01Error = {
     email?: string[]
 }
 
-export async function validateEmail(prev: FormState<CustumerRegistrationStep01Error>, formData: FormData): Promise<FormState<CustumerRegistrationStep01Error>> {
+export async function validateEmail(prev: FormState<CustumerRegistrationStep01Error, any>, formData: FormData): Promise<FormState<CustumerRegistrationStep01Error, any>> {
 
     const validatedFields = Step01Schema.safeParse(
         Object.fromEntries(formData.entries())
@@ -27,10 +27,16 @@ export async function validateEmail(prev: FormState<CustumerRegistrationStep01Er
     const { email } = validatedFields.data
 
     try {
+
+        const exists: Array<any> = await fetch(`http://localhost:3001/users?email=${email}`)
+            .then(data => data.json())
+
+        if (exists.length > 0) throw new Error("E-mail já cadastrado")
+            
         return { success: true }
     } catch (err) {
         console.error(err)
-        return { success: false, message: "Erro Interno do Servidor" }
+        return { success: false, message: err?.message || "Erro Interno do Servidor" }
     }
 }
 
@@ -41,7 +47,7 @@ export type CustumerRegistrationStep02Error = {
     phone?: string[]
 }
 
-export async function custumerRegisterStep02(prev: FormState<CustumerRegistrationStep02Error>, formData: FormData): Promise<FormState<CustumerRegistrationStep02Error>> {
+export async function custumerRegisterStep02(prev: FormState<CustumerRegistrationStep02Error, any>, formData: FormData): Promise<FormState<CustumerRegistrationStep02Error, any>> {
 
     const validatedFields = Step02Schema.safeParse(
         Object.fromEntries(formData.entries())
@@ -80,7 +86,7 @@ export type CustumerRegistrationStep03Error = {
     state?: string[],
 }
 
-export async function custumerRegisterStep03(prev: FormState<CustumerRegistrationStep03Error>, formData: FormData): Promise<FormState<CustumerRegistrationStep03Error>> {
+export async function custumerRegisterStep03(prev: FormState<CustumerRegistrationStep03Error, any>, formData: FormData): Promise<FormState<CustumerRegistrationStep03Error, any>> {
 
     const validatedFields = Step03Schema.safeParse(
         Object.fromEntries(formData.entries())
@@ -117,7 +123,7 @@ export type CustumerRegistrationStep04Error = {
     confPassword?: string[]
 }
 
-export async function custumerRegisterStep04(prev: FormState<CustumerRegistrationStep04Error>, formData: FormData): Promise<FormState<CustumerRegistrationStep04Error>> {
+export async function custumerRegisterStep04(prev: FormState<CustumerRegistrationStep04Error, any>, formData: FormData): Promise<FormState<CustumerRegistrationStep04Error, any>> {
 
     const validatedFields = Step04Schema.safeParse(
         Object.fromEntries(formData.entries())
@@ -156,7 +162,7 @@ type CustumerRegistrationError = CustumerRegistrationStep01Error &
     CustumerRegistrationStep03Error &
     Omit<CustumerRegistrationStep04Error, "confPassword">
 
-export async function custumerRegister(prev: FormState<CustumerRegistrationError>, formData: FormData): Promise<FormState<CustumerRegistrationError>> {
+export async function custumerRegister(prev: FormState<CustumerRegistrationError, any>, formData: FormData): Promise<FormState<CustumerRegistrationError, any>> {
     const validatedFields = CustumerRegistrationSchema.safeParse(Object.fromEntries(formData.entries()))
 
     if (!validatedFields.success) {
