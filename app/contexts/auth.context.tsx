@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 interface IAuthContext {
     user: { id: string } | null;
@@ -40,4 +40,10 @@ export function AuthProvider({ children }: { children?: ReactNode }) {
             {children}
         </Context.Provider>
     )
+}
+
+export function useAuth() {
+    const context = useContext(Context)
+    if (!context) throw new Error("O 'useAuth' deve ser utilizado dentro do 'AuthProvider'")
+    return context
 }

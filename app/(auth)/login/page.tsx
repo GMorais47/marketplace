@@ -4,7 +4,7 @@ import { login, LoginError } from "@/app/actions/login";
 import { Button } from "@/app/components/button";
 import { Input } from "@/app/components/input";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useEffect } from "react"
 import toast from "react-hot-toast";
 
@@ -13,13 +13,15 @@ const initialState: FormState<LoginError, any> = { success: false }
 export default function Page() {
     const [state, formAction, isPending] = useActionState(login, initialState)
     const router = useRouter()
+    const queries = useSearchParams()
 
     useEffect(() => {
 
         if (state.success) {
             toast.success(state.message || "Login realizado com sucesso!")
-            setTimeout(()=> {
-                router.push("/")
+            setTimeout(() => {
+                const path = queries.get('redirect')
+                router.push(path ? path : "/")
             }, 2000)
         } else if (state.errors || state.message) {
             let message: string | undefined

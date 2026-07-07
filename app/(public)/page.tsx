@@ -2,18 +2,18 @@
 
 import { FaCartPlus } from "react-icons/fa";
 import { Card } from "../components/card";
-import { CATEGORIES } from "../mocks/categories";
 import { PRODUCTS } from "../mocks/products";
 import { useCart } from "../contexts/cart.context";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { Image } from "../components/image";
+import { useCategory } from "../contexts/category.context";
 
 function Item({ data }: { data: IProduct }) {
+  const { getOneById } = useCategory()
   const { add } = useCart();
 
-  const category = CATEGORIES
-    .find(ct => ct.id === data.categoryID);
+  const category = getOneById(String(data.categoryID))
 
   const onClick = () => {
     add({

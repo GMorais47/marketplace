@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Header } from "./components/header";
 import { AuthProvider } from "../contexts/auth.context";
+import { CategoryProvider } from "../contexts/category.context";
 
 interface IProps {
     children: ReactNode
@@ -8,11 +9,13 @@ interface IProps {
 
 export default function Layout({ children }: Readonly<IProps>) {
     return (
-        <AuthProvider>
-            <Header />
-            <main className="p-2 overflow-auto">
-                {children}
-            </main>
-        </AuthProvider>
+        <CategoryProvider>
+            <AuthProvider>
+                <Header />
+                <main className="p-2 overflow-auto">
+                    {children}
+                </main>
+            </AuthProvider>
+        </CategoryProvider>
     )
 }

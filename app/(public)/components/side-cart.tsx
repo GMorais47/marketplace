@@ -2,19 +2,22 @@
 
 import { Image } from "@/app/components/image";
 import { useCart } from "@/app/contexts/cart.context"
-import { CATEGORIES } from "@/app/mocks/categories";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, use, useEffect, useState } from "react";
 import { IoClose, IoTrash } from "react-icons/io5";
 import { QuantitySelector } from "./quantity-selector";
 import Link from "next/link";
+import { useCategory } from "@/app/contexts/category.context";
 
 interface IPropsItem {
     data: IProductCart
 }
 
 function Item({ data }: IPropsItem) {
+    const { getOneById } = useCategory()
     const { add, remove } = useCart();
     const [amount, setAmount] = useState(data.amount);
+
+    const category = getOneById(String(data.categoryID))
 
     useEffect(() => {
         if (amount > data.amount) {
@@ -39,8 +42,7 @@ function Item({ data }: IPropsItem) {
                         <div className="text-xs font-bold">{data.name}</div>
                         <div className="text-[8px] text-slate-500">
                             {
-                                CATEGORIES
-                                    .find(ct => ct.id === data.categoryID)?.name || "Não identificada"
+                                category?.name || "Não identificado"
                             }
                         </div>
                     </div>

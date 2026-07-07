@@ -2,20 +2,20 @@
 
 import { Button } from "@/app/components/button";
 import { Card } from "@/app/components/card";
-import { CATEGORIES } from "@/app/mocks/categories";
 import { PRODUCTS } from "@/app/mocks/products";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { FaCartPlus, FaStar } from "react-icons/fa";
-import { MdHideImage } from "react-icons/md";
 import { QuantitySelector } from "../../components/quantity-selector";
 import { useState } from "react";
 import { useCart } from "@/app/contexts/cart.context";
 import { IoArrowRedoSharp } from "react-icons/io5";
 import { Image } from "@/app/components/image";
+import { useCategory } from "@/app/contexts/category.context";
 
 export default function Page() {
+  const { getOneById, data: categories } = useCategory();
   const { id } = useParams<{ id: string }>()
   const [amount, setAmount] = useState<number>(1)
   const { add } = useCart()
@@ -32,7 +32,7 @@ export default function Page() {
     return
   }
 
-  const category = CATEGORIES.find(cat => cat.id === product.categoryID)
+  const category = getOneById(String(product.categoryID))
 
   const handleAdd = () => {
     add({ ...product, amount })
@@ -116,7 +116,7 @@ export default function Page() {
                   .map(prd => (
                     <li key={`seller-product-${prd.id}`} >
                       <Link
-                        href={`${CATEGORIES.find(cat => cat.id === prd.categoryID)?.path}/${prd.id}`}
+                        href={`${categories.find(cat => cat.id === String(prd.categoryID))?.path}/${prd.id}`}
                         className="flex flex-row items-center gap-2">
                         <Image
                           alt={prd.name}

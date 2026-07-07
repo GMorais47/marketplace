@@ -1,14 +1,14 @@
 "use client"
 
 import { useCart } from "@/app/contexts/cart.context"
-import { CATEGORIES } from "@/app/mocks/categories"
 import Link from "next/link"
 import { ReactNode, useState } from "react"
 import { FaAngleRight, FaUserCircle } from "react-icons/fa"
 import { HiMenu } from "react-icons/hi"
 import { IoCart, IoClose } from "react-icons/io5"
-import { MdFavorite } from "react-icons/md"
 import { SideCart } from "./side-cart"
+import { useCategory } from "@/app/contexts/category.context"
+import { useAuth } from "@/app/contexts/auth.context"
 
 function HeaderButton({ children, onClick, notification }: {
     children: ReactNode,
@@ -49,7 +49,7 @@ function SidebarList({
 }: {
     keyItem: string,
     label: string,
-    data: Array<{ id: number, label: string, href: string }>
+    data: Array<{ id: string, label: string, href: string }>
 }) {
     return (
         <ul className="text-[10px] text-slate-600 px-2">
@@ -63,9 +63,11 @@ function SidebarList({
 }
 
 export function Header() {
+    const { data: categories } = useCategory();
     const [show, setShow] = useState<boolean>(false);
     const [showCart, setShowCart] = useState<boolean>(false);
     const { cart } = useCart();
+    const { user } = useAuth();
 
     return (
         <>
@@ -81,22 +83,26 @@ export function Header() {
                         </Link>
                     </div>
                     <div className="h-full flex-1 flex flex-row justify-end items-center gap-2 p-2">
-                        {/* FAVORITOS */}
-                        <HeaderButton>
-                            <MdFavorite />
-                        </HeaderButton>
                         {/* CARRINHO */}
                         <HeaderButton onClick={() => setShowCart(true)} notification={cart.products.reduce((prev, curr) => prev + curr.amount, 0)}>
                             <IoCart />
                         </HeaderButton>
                         {/* LOGIN */}
-                        <Link href="/login" className="bg-[#00BC99] hover:bg-[#03738C88] text-[10px] font-semibold rounded-lg px-4 py-1">Login</Link>
+                        {
+                            user ? (
+                                <HeaderButton>
+                                    <FaUserCircle />
+                                </HeaderButton>
+                            ) : (
+                                <Link href="/login" className="bg-[#00BC99] hover:bg-[#03738C88] text-[10px] font-semibold rounded-lg px-4 py-1">Login</Link>
+                            )
+                        }
                     </div>
                 </div>
                 <div className="bg-[#03738c] text-white w-full">
                     <ul className="flex flex-row justify-center flex-wrap items-center text-[10px] text-center">
                         {
-                            CATEGORIES
+                            categories
                                 .filter(vl => vl.highlights)
                                 .sort((a, b) => a.name.localeCompare(b.name))
                                 .map(vl => (
@@ -134,7 +140,7 @@ export function Header() {
 
                     <div className="h-[calc(100%-60px)] w-full py-2 overflow-y-scroll flex flex-col gap-2">
                         <SidebarList keyItem="seller-lat" label="Top 5 Lojistas" data={
-                            CATEGORIES
+                            categories
                                 .slice(0, 5)
                                 .sort((a, b) => a.name.localeCompare(b.name))
                                 .map((vl) => ({
@@ -144,7 +150,7 @@ export function Header() {
                                 }))
                         } />
                         <SidebarList keyItem="category-lat" label="Categorias" data={
-                            CATEGORIES
+                            categories
                                 .sort((a, b) => a.name.localeCompare(b.name))
                                 .map((vl) => ({
                                     id: vl.id,

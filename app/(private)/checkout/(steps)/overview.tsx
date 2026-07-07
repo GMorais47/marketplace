@@ -2,11 +2,12 @@ import { Button } from "@/app/components/button";
 import { Card } from "@/app/components/card";
 import { Image } from "@/app/components/image";
 import { Input } from "@/app/components/input";
+import { useCategory } from "@/app/contexts/category.context";
 import { useCheckout } from "@/app/contexts/checkout.context";
-import { CATEGORIES } from "@/app/mocks/categories";
 
 export function Overview({ onNext, onPrevius }: { onNext: () => void, onPrevius: () => void }) {
     const { cart, address, payment } = useCheckout()
+    const { getOneById } = useCategory()
 
     const onChange = () => { }
     return (
@@ -28,7 +29,7 @@ export function Overview({ onNext, onPrevius }: { onNext: () => void, onPrevius:
                                             />
                                             <div>
                                                 <div className="font-bold">{prd.name}</div>
-                                                <div className="text-sm">{CATEGORIES.find(({ id }) => id === prd.categoryID)?.name || "Não identificado"}</div>
+                                                <div className="text-sm">{getOneById(String(prd.categoryID))?.name || "Não identificado"}</div>
                                                 <div className="text-xs">Quantidade: {prd.amount}</div>
                                             </div>
                                         </div>

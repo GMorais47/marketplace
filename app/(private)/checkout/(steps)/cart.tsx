@@ -5,12 +5,15 @@ import { Button } from "@/app/components/button";
 import { Card } from "@/app/components/card";
 import { Image } from "@/app/components/image";
 import { useCart } from "@/app/contexts/cart.context";
-import { CATEGORIES } from "@/app/mocks/categories";
+import { useCategory } from "@/app/contexts/category.context";
 import { useEffect, useState } from "react";
 
 function Item({ data }: { data: IProductCart }) {
+    const { getOneById } = useCategory()
     const { add, remove } = useCart()
     const [amount, setAmount] = useState(data.amount);
+
+    const category = getOneById(String(data.categoryID))
 
     useEffect(() => {
         if (amount > data.amount) {
@@ -19,7 +22,6 @@ function Item({ data }: { data: IProductCart }) {
             remove({ ...data, amount: 1 })
         }
     }, [amount])
-
 
     return (
         <div className="flex flex-row gap-2">
@@ -33,7 +35,7 @@ function Item({ data }: { data: IProductCart }) {
             <div className="flex-1 flex flex-row items-center justify-between">
                 <div>
                     <div className="font-bold">{data.name}</div>
-                    <div className="text-xs text-slate-400">{CATEGORIES.find(cat => cat.id === data.categoryID)?.name || "Não identificado"}</div>
+                    <div className="text-xs text-slate-400">{category?.name || "Não identificado"}</div>
                     <QuantitySelector amount={amount} setAmount={setAmount} />
                 </div>
                 <div className="font-bold text-lg">{(data.price * data.amount).toLocaleString("pt-br", { style: "currency", currency: "BRL" })}</div>
